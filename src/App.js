@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Form, Button, ListGroup } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 
 
 function App() {
@@ -43,7 +44,7 @@ function App() {
   };
 
   const toggleTodoStatus = (id, currentState) => {
-    const newDoneState = currentState === 1 ? false : true;
+    const newDoneState = currentState == 1 ? false : true;
 
     axios.put(`${API_BASE_URL}/index.php?id=${id}`, { done: newDoneState })
       .then(response => {
@@ -55,40 +56,69 @@ function App() {
   };
 
   const deleteTodo = (id) => {
-    axios.delete(`${API_BASE_URL}/index.php?id=${id}`)
-      .then(response => {
-        fetchTodos();
-      })
-      .catch(error => {
-        console.error('Error deleting todo:', error);
-      });
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You can not revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(`${API_BASE_URL}/index.php?id=${id}`)
+          .then(response => {
+            fetchTodos();
+            Swal.fire(
+              'Deleted!',
+              'The task has been deleted.',
+              'success'
+            );
+          })
+          .catch(error => {
+            console.error('Error deleting todo:', error);
+            Swal.fire(
+              'Error',
+              'There were a problem trying to delete this task.',
+              'error'
+            );
+          });
+      }
+    });
   };
+
 
   return (
     <Container>
-      <h1 className="mt-3">Lista de Tareas</h1>
+      <h1 className="mt-3">To Do List</h1>
       <Form onSubmit={handleFormSubmit} className="mb-3">
-        <Form.Group controlId="formTodo">
-          <Form.Control type="text" placeholder="Ingrese una nueva tarea" value={newTodo} onChange={handleInputChange} />
+        <Form.Group controlId="formTodo" className="d-flex">
+          <Form.Control type="text" placeholder="Create a new task" value={newTodo} onChange={handleInputChange} className="mr-2" />
+          <Button variant="primary" type="submit">
+            Add
+          </Button>
         </Form.Group>
-        <Button variant="primary" type="submit">
-          Agregar Tarea
-        </Button>
       </Form>
       <ListGroup>
-        {todos.map(todo => (
-          <ListGroup.Item key={todo.id}>
-            <span style={{ textDecoration: todo.done == 0 ? 'none' : 'line-through' }}>
-              {todo.task_name}
-            </span>
-            <Button variant="secondary" className="ms-2" onClick={() => toggleTodoStatus(todo.id, todo.done)}>
-              {todo.done == 0 ? 'Mark as done' : 'Mark as pending'} {todo.done}
-            </Button>
-            <Button variant="danger" className="ms-2" onClick={() => deleteTodo(todo.id)}>
-              Delete
-            </Button>
-          </ListGroup.Item>
-        ))}
+        {todos.map(todo => {
+          let isDone = todo.done == 1 ? true : false;
+          return (
+            <ListGroup.Item key={todo.id} className="d-flex justify-content-between align-items-center">
+              <span style={{ textDecoration: isDone ? 'line-through' : 'none' }}>
+                {todo.task_name}
+              </span>
+              <div className="btn-group" role="group" aria-label="Acciones">
+                <Button variant="secondary" onClick={() => toggleTodoStatus(todo.id, isDone)}>
+                  {isDone ? 'Pending' : 'Done'}
+                </Button>
+                <Button variant="danger" onClick={() => deleteTodo(todo.id)}>
+                  Delete
+                </Button>
+              </div>
+            </ListGroup.Item>
+          );
+        })}
       </ListGroup>
     </Container>
   );

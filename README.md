@@ -4,6 +4,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+Before to start, you have to install the dependencies with:
+
+### `npm install`
+
+After of that, you have to create an .env file with the next parameters:
+
+REACT_APP_API_URL=
+
+The value should be the address of your API backend endpoint
+
 In the project directory, you can run:
 
 ### `npm start`
@@ -69,7 +79,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-instalar axios con "npm install axios"
-instalar bootstrap con "npm install react-bootstrap bootstrap"
 
 # astrotech-front

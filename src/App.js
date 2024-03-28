@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Form, Button, ListGroup } from 'react-bootstrap';
+import { Container, ListGroup } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 
+import FormComponent from './components/FormComponent';
+import DoneButtonComponent from './components/DoneButtonComponent';
+import DeleteButtonComponent from './components/DeleteButtonComponent';
 
 function App() {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
@@ -92,14 +95,7 @@ function App() {
   return (
     <Container>
       <h1 className="mt-3">To Do List</h1>
-      <Form onSubmit={handleFormSubmit} className="mb-3">
-        <Form.Group controlId="formTodo" className="d-flex">
-          <Form.Control type="text" placeholder="Create a new task" value={newTodo} onChange={handleInputChange} className="mr-2" />
-          <Button variant="primary" type="submit">
-            Add
-          </Button>
-        </Form.Group>
-      </Form>
+      <FormComponent onSubmit={handleFormSubmit} newTodo={newTodo} handleInputChange={handleInputChange} handleFormSubmit={handleFormSubmit}/>
       <ListGroup>
         {todos.map(todo => {
           let isDone = todo.done == 1 ? true : false;
@@ -108,13 +104,9 @@ function App() {
               <span style={{ textDecoration: isDone ? 'line-through' : 'none' }}>
                 {todo.task_name}
               </span>
-              <div className="btn-group" role="group" aria-label="Acciones">
-                <Button variant="secondary" onClick={() => toggleTodoStatus(todo.id, isDone)}>
-                  {isDone ? 'Pending' : 'Done'}
-                </Button>
-                <Button variant="danger" onClick={() => deleteTodo(todo.id)}>
-                  Delete
-                </Button>
+              <div className="btn-group" role="group" aria-label="Actions">
+                <DoneButtonComponent isDone={isDone} onClick={() => toggleTodoStatus(todo.id, isDone)} />
+                <DeleteButtonComponent onClick={() => deleteTodo(todo.id)} />
               </div>
             </ListGroup.Item>
           );

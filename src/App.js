@@ -3,6 +3,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, ListGroup } from 'react-bootstrap';
 import Swal from 'sweetalert2';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import FormComponent from './components/FormComponent';
 import DoneButtonComponent from './components/DoneButtonComponent';
@@ -43,15 +45,18 @@ function App() {
         .catch(error => {
           console.error('Error creating todo:', error);
         });
+    } else {
+      toast.error('You have to write a description task name');
     }
   };
 
-  const toggleTodoStatus = (id, currentState) => {
+  const toggleTodoStatus = (id, currentState, taskName) => {
     const newDoneState = currentState == 1 ? false : true;
 
     axios.put(`${API_BASE_URL}/index.php?id=${id}`, { done: newDoneState })
       .then(response => {
         fetchTodos();
+        toast.info(`You change the status of ${taskName}`);
       })
       .catch(error => {
         console.error('Error updating todo:', error);
@@ -95,7 +100,7 @@ function App() {
   return (
     <Container>
       <h1 className="mt-3">To Do List</h1>
-      <FormComponent onSubmit={handleFormSubmit} newTodo={newTodo} handleInputChange={handleInputChange} handleFormSubmit={handleFormSubmit}/>
+      <FormComponent onSubmit={handleFormSubmit} newTodo={newTodo} handleInputChange={handleInputChange} handleFormSubmit={handleFormSubmit} />
       <ListGroup>
         {todos.map(todo => {
           let isDone = todo.done == 1 ? true : false;
@@ -105,13 +110,14 @@ function App() {
                 {todo.task_name}
               </span>
               <div className="btn-group" role="group" aria-label="Actions">
-                <DoneButtonComponent isDone={isDone} onClick={() => toggleTodoStatus(todo.id, isDone)} />
+                <DoneButtonComponent isDone={isDone} onClick={() => toggleTodoStatus(todo.id, isDone, todo.task_name)} />
                 <DeleteButtonComponent onClick={() => deleteTodo(todo.id)} />
               </div>
             </ListGroup.Item>
           );
         })}
       </ListGroup>
+      <ToastContainer position="bottom-right" />
     </Container>
   );
 }
